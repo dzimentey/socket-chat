@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
 import {io} from "socket.io-client";
 
@@ -15,21 +15,31 @@ function App() {
         })
     }, [])
 
+
     const [messages, setMessages] = useState <Array<any>>([])
 
     const [text, setText] = useState("")
     const [name, setName] = useState("")
 
+    useEffect(() => {
+        messagesAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
+    },[messages])
+
+    const messagesAnchorRef = useRef<HTMLDivElement>(null)
+
     return (
         <div className={'App'}>
-            <div style={{border: '1px solid black', padding: '10px',width: '300px', height: '300px', overflow: 'scroll'}}>
+            <div style={{border: '1px solid black', padding: '10px',width: '300px', height: '300px', overflow: 'scroll',
+                overflowX:'hidden'}}>
                 {messages.map((m: any) => {
                  return <div key={m.id}>
                      <b>{m.user.name}:</b> {m.message}
                      <hr/>
                  </div>
                 })}
+                <div ref={messagesAnchorRef}></div>
             </div>
+
             <div>
                 <input value={name} onChange={(e) => setName(e.currentTarget.value)}
                         placeholder={'type your name here'}
