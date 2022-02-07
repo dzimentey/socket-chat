@@ -35,7 +35,7 @@ function App() {
                         placeholder={'type your name here'}
                 />
                 <button onClick={()=>{socket.emit('client-name-sent', name);
-                }}>send Name</button>
+                }}>set Name</button>
             </div>
             <div>
                 <textarea value={text} onChange={(e) => setText(e.currentTarget.value)}
