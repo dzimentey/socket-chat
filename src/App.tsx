@@ -20,6 +20,8 @@ function App() {
 
     const [text, setText] = useState("")
     const [name, setName] = useState("")
+    const [autoscroll, setAutoScroll] = useState<boolean>(true)
+    const [lastScrollTop, setLastScrollTop] = useState(0)
 
     useEffect(() => {
         messagesAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
@@ -30,7 +32,15 @@ function App() {
     return (
         <div className={'App'}>
             <div style={{border: '1px solid black', padding: '10px',width: '300px', height: '300px', overflow: 'scroll',
-                overflowX:'hidden'}}>
+                overflowX:'hidden'}} onScroll={(e) => {
+                setLastScrollTop(e.currentTarget.scrollTop)
+                    if(e.currentTarget.scrollTop > lastScrollTop) {
+                        setAutoScroll(true)
+                        }
+                    else {
+                        setAutoScroll(false)
+                    }
+            }}>
                 {messages.map((m: any) => {
                  return <div key={m.id}>
                      <b>{m.user.name}:</b> {m.message}
