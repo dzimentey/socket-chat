@@ -10,11 +10,15 @@ function App() {
         socket.on('got-init-messages', (initMessages) => {
             setMessages(initMessages)
         } )
+        socket.on('new-message-sent', (messageItem) => {
+            setMessages((messages) => [...messages, messageItem])
+        })
     }, [])
 
-    const [messages, setMessages] = useState([])
+    const [messages, setMessages] = useState <Array<any>>([])
 
-    const [message, setMessage] = useState("HI-hi")
+    const [text, setText] = useState("")
+    const [name, setName] = useState("")
 
     return (
         <div className={'App'}>
@@ -27,9 +31,19 @@ function App() {
                 })}
             </div>
             <div>
-                <textarea value={message} onChange={(e) => setMessage(e.currentTarget.value)}></textarea>
-                <button onClick={()=>{socket.emit('message-sent', message);
-                                        setMessage('');
+                <input value={name} onChange={(e) => setName(e.currentTarget.value)}
+                        placeholder={'type your name here'}
+                />
+                <button onClick={()=>{socket.emit('client-name-sent', name);
+                }}>send Name</button>
+            </div>
+            <div>
+                <textarea value={text} onChange={(e) => setText(e.currentTarget.value)}
+                          placeholder={'your message'}>
+
+                </textarea>
+                <button onClick={()=>{socket.emit('message-sent', text);
+                                        setText('');
                 }}>Send</button>
             </div>
         </div>
