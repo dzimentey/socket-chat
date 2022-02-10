@@ -1,22 +1,24 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
-import {io} from "socket.io-client";
+import {useDispatch, useSelector} from "react-redux";
+import {RootStateType} from "./store";
+import {createConnectionTC, destroyConnectionTC, sendMessageTC, setClientNameTC} from "./chat-reducer";
 
-const socket = io('http://localhost:3009');
 
 function App() {
 
-    useEffect( () => {
-        socket.on('got-init-messages', (initMessages) => {
-            setMessages(initMessages)
-        } )
-        socket.on('new-message-sent', (messageItem) => {
-            setMessages((messages) => [...messages, messageItem])
-        })
+    const dispatch = useDispatch()
+    const messages = useSelector<RootStateType, any>(state => state.chat.messages)
+
+    useEffect(() => {
+      dispatch(createConnectionTC()) // acts after a component will be rendered
+        return () => {
+          dispatch(destroyConnectionTC()) // acts when a component will died
+        }
     }, [])
 
 
-    const [messages, setMessages] = useState <Array<any>>([])
+    //const [messages, setMessages] = useState<Array<any>>([])
 
     const [text, setText] = useState("")
     const [name, setName] = useState("")
@@ -25,46 +27,53 @@ function App() {
 
     useEffect(() => {
         messagesAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
-    },[messages])
+    }, [messages])
 
     const messagesAnchorRef = useRef<HTMLDivElement>(null)
 
     return (
         <div className={'App'}>
-            <div style={{border: '1px solid black', padding: '10px',width: '300px', height: '300px', overflow: 'scroll',
-                overflowX:'hidden'}} onScroll={(e) => {
+            <div style={{
+                border: '1px solid black', padding: '10px', width: '300px', height: '300px', overflow: 'scroll',
+                overflowX: 'hidden'
+            }} onScroll={(e) => {
                 setLastScrollTop(e.currentTarget.scrollTop)
-                    if(e.currentTarget.scrollTop > lastScrollTop) {
-                        setAutoScroll(true)
-                        }
-                    else {
-                        setAutoScroll(false)
-                    }
+                if (e.currentTarget.scrollTop > lastScrollTop) {
+                    setAutoScroll(true)
+                } else {
+                    setAutoScroll(false)
+                }
             }}>
                 {messages.map((m: any) => {
-                 return <div key={m.id}>
-                     <b>{m.user.name}:</b> {m.message}
-                     <hr/>
-                 </div>
+                    return <div key={m.id}>
+                        <b>{m.user.name}:</b> {m.message}
+                        <hr/>
+                    </div>
                 })}
                 <div ref={messagesAnchorRef}></div>
             </div>
 
             <div>
                 <input value={name} onChange={(e) => setName(e.currentTarget.value)}
-                        placeholder={'type your name here'}
+                       placeholder={'type your name here'}
                 />
-                <button onClick={()=>{socket.emit('client-name-sent', name);
-                }}>set Name</button>
+                <button onClick={() => {
+                    dispatch(setClientNameTC(name))
+                    //socket.emit('client-name-sent', name);
+                }}>set Name
+                </button>
             </div>
             <div>
                 <textarea value={text} onChange={(e) => setText(e.currentTarget.value)}
                           placeholder={'your message'}>
 
                 </textarea>
-                <button onClick={()=>{socket.emit('message-sent', text);
-                                        setText('');
-                }}>Send</button>
+                <button onClick={() => {
+                    //socket.emit('message-sent', text);
+                   dispatch( sendMessageTC(text))
+                    setText('');
+                }}>Send
+                </button>
             </div>
         </div>
     )
