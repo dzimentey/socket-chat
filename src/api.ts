@@ -8,9 +8,13 @@ export const api = {
     createConnection() {
         this.socket = io('http://localhost:3009')
     },
-    subscribe(initMessageHandler: (messages: any) => void, newMessageSentHandler: (message: any) => void) {
+    subscribe(initMessageHandler: (messages: any) => void,
+              newMessageSentHandler: (message: any) => void,
+              userTypingHandler: (user: any) => void,
+              ) {
         this.socket?.on('got-init-messages', initMessageHandler)
         this.socket?.on('new-message-sent', newMessageSentHandler)
+        this.socket?.on('user-typing', userTypingHandler)
     },
     destroyConnection() {
         this.socket?.disconnect()
@@ -21,6 +25,9 @@ export const api = {
     },
     sendTextMessage(text: string) {
         this.socket?.emit('message-sent', text)
+    },
+    typingMessage() {
+        this.socket?.emit('client-typing')
     }
 
 }
