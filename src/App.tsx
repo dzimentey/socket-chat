@@ -2,13 +2,14 @@ import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
 import {useDispatch, useSelector} from "react-redux";
 import {RootStateType} from "./store";
-import {createConnectionTC, destroyConnectionTC, sendMessageTC, setClientNameTC} from "./chat-reducer";
+import {createConnectionTC, destroyConnectionTC, sendMessageTC, setClientNameTC, typingMessageTC} from "./chat-reducer";
 
 
 function App() {
 
     const dispatch = useDispatch()
-    const messages = useSelector<RootStateType, any>(state => state.chat.messages)
+    const messages = useSelector<RootStateType, Array<any>>(state => state.chat.messages)
+    const typingUsers = useSelector<RootStateType, Array<any>>(state => state.chat.typingUsers)
 
     useEffect(() => {
       dispatch(createConnectionTC()) // acts after a component will be rendered
@@ -50,6 +51,13 @@ function App() {
                         <hr/>
                     </div>
                 })}
+
+                {typingUsers.map((u: any) => {
+                    return <div key={u.id}>
+                        <b>{u.name}:</b> ...is typing
+                    </div>
+                })}
+
                 <div ref={messagesAnchorRef}></div>
             </div>
 
@@ -65,7 +73,8 @@ function App() {
             </div>
             <div>
                 <textarea value={text} onChange={(e) => setText(e.currentTarget.value)}
-                          placeholder={'your message'}>
+                          placeholder={'your message'} onKeyPress={() => dispatch( typingMessageTC() )}
+                >
 
                 </textarea>
                 <button onClick={() => {
