@@ -37,7 +37,7 @@ export const createConnectionTC = () => (dispatch: Dispatch) => {
         (messages: any) => {
             dispatch(messagesReceivedAC(messages))
         },
-        (message: any) => {
+        (message: string) => {
             dispatch(newMessageReceivedAC(message))
         },
         (user: any) => {
