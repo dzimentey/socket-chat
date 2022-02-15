@@ -9,7 +9,7 @@ export const api = {
         this.socket = io('http://localhost:3009')
     },
     subscribe(initMessageHandler: (messages: any) => void,
-              newMessageSentHandler: (message: any) => void,
+              newMessageSentHandler: (message: string) => void,
               userTypingHandler: (user: any) => void,
               ) {
         this.socket?.on('got-init-messages', initMessageHandler)
